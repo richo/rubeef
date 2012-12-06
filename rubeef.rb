@@ -46,10 +46,11 @@ class Tape
 
 end
 
-module CallStack extend self
-  def stack
-    @stack ||= []
+class CallStack
+  def initialize
+    @stack = []
   end
+  attr_reader :stack
 
   def current
     stack[-1]
@@ -66,6 +67,7 @@ end
 
 def run(code)
   tape = Tape.new
+  stack = CallStack.new
   idx = 0
   last = code.length - 1
   skip = 0
@@ -80,8 +82,8 @@ def run(code)
       end
       next
     end
+
     # End special case
-    #
     case code[idx]
     when ">"
       tape.rshift
@@ -99,13 +101,13 @@ def run(code)
       if tape.current_value == 0
 
       else
-        CallStack << idx
+        stack << idx
       end
     when "]"
       if tape.current_value != 0
-        idx = CallStack.current
+        idx = stack.current
       else
-        CallStack.unwind
+        stack.unwind
       end
     end
     idx += 1
